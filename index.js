@@ -26,6 +26,15 @@ io.on('connection', (socket) => {
     socket.on('unitCount', (data) => {
         io.sockets.emit('unitCount', data);
     });
+    socket.on('machine:history', (data) => {
+        io.sockets.emit('machine:history', data);
+    });
+    socket.on('machine:init', (data) => {
+        io.sockets.emit('machine:init', data);
+    });
+    socket.on('timer:start', (data) => {
+        io.sockets.emit('timer:start', data);
+    });
 });
 
 

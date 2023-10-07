@@ -1,3 +1,6 @@
+const Redis = require('ioredis');
+const REDIS_URL = 'redis://localhost:6379'; // Reemplaza con la URL de tu servidor Redis
+
 io = require('socket.io-client');
 const socket = io("http://localhost:3000")
 let count = 0;
@@ -20,13 +23,25 @@ Butto1.watch(function (err, value) { //Watch for hardware interrupts on pushButt
     socket.emit('onOff', count++ + 1)
     console.log(count)
 });
+
 Butto2.watch(function (err, value) { //Watch for hardware interrupts on pushButton GPIO, specify callback function
-    if (err) { //if an error
-        console.error('There was an error', err); //output error message to console
-        return;
-    }
-    socket.emit('unitCount', count2++ + 1)
-    console.log(count2)
+  if (err) { //if an error
+    console.error('There was an error', err); //output error message to console
+    return;
+  }
+  // Crea una instancia de la conexión a Redis
+  const redis = new Redis(REDIS_URL);
+  redis.lrange('history-test4', -1, -1)
+    .then(result => {
+      const ultimoValor = result[0] || new Date().getTime();
+      socket.emit('unitCount', {
+        count:count2++ + 1,
+        lastStop: ultimoValor
+      })
+    })
+    .catch(error => {
+      console.error('Error al obtener el último valor:', error);
+    });
 });
 
 
